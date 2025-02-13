@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Login from "./Login";
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(null);
+
+  // Threat states
   const [threats, setThreats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,10 +23,31 @@ const App = () => {
   };
 
   useEffect(() => {
+    // On first mount, check if we already have a token saved (refresh scenario).
+    const savedToken = localStorage.getItem("jwtToken");
+    if (savedToken) {
+      setToken(savedToken);
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  // Whenever `page`, `filterType`, etc. changes, fetch new data
+  useEffect(() => {
     const fetchThreats = async () => {
+      if (!token) {
+        // If no token, don't fetch yet.
+        return;
+      }
+
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8000/api/threats`, {
+        setError(null);
+
+        // Attach Bearer token to Authorization header
+        const response = await axios.get("http://localhost:8000/api/threats", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           params: {
             page,
             limit,
@@ -41,7 +67,7 @@ const App = () => {
     };
 
     fetchThreats();
-  }, [page, filterType, sortBy, sortOrder]);
+  }, [page, filterType, sortBy, sortOrder, token]);
 
   const toggleSortOrder = (column) => {
     if (sortBy === column) {
@@ -53,12 +79,39 @@ const App = () => {
     setPage(1); // Reset to first page when sorting
   };
 
+  // Handler when login is successful
+  const handleLoginSuccess = (newToken) => {
+    setToken(newToken);
+    setIsLoggedIn(true);
+  };
+
+  // Handler to log out
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken");
+    setToken(null);
+    setIsLoggedIn(false);
+  };
+
+  if (!isLoggedIn) {
+    // If the user is not logged in, show the login form
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // Otherwise, show the threats dashboard
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Threat Intelligence Dashboard
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Threat Intelligence Dashboard
+          </h1>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 text-white px-4 py-2 rounded"
+          >
+            Logout
+          </button>
+        </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -137,6 +190,9 @@ const App = () => {
             </table>
           </div>
         )}
+
+        {loading && <p>Loading...</p>}
+        {error && <p className="text-red-600">{error}</p>}
       </div>
     </div>
   );
