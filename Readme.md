@@ -34,6 +34,7 @@ A simple demo project showcasing a Node/Express backend and a React + Tailwind C
 ```bash
 git clone https://github.com/yourusername/icaro-assignment.git
 cd icaro-assignment
+```
 
 ## 2. Environment Variables
 In the `backend` folder, create a `.env` file with the following content (adjust to your actual credentials and keep them private):
