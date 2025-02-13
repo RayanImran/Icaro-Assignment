@@ -92,6 +92,43 @@ By default, the React app should start on **[http://localhost:5173](http://local
 - The `CORS_ORIGIN` in `.env` should match the origin of your React app if you run into **CORS issues**.
 - In a **production environment**, you’d typically run:  npm run build
 
+# Architecture Overview
+
+## Frontend
+- Built with **React** and **Tailwind CSS**.
+- Calls the backend API to fetch threat intelligence data.
+- Uses **JWT authentication** for user login.
+- Allows **filtering and sorting** of threats.
+
+## Backend
+- Built with **Node.js** and **Express**.
+- Connects to a **MongoDB** database using **Mongoose**.
+- Fetches recent threats from **URLHaus** and caches them.
+- Implements **JWT authentication** for secure access.
+- Provides **API endpoints** for filtering and sorting threats.
+
+## Database
+- Uses **MongoDB** as the primary database.
+- Stores **fetched threats** and **user authentication data**.
+
+## Authentication
+- Uses **JWT-based authentication** for secure user login.
+- The **JWT secret key** should be stored in the **.env** file.
+
+## Known Limitations & Assumptions
+
+### Limitations
+- Currently, there is **no role-based access control (RBAC)**; all authenticated users have the same access.
+- The app fetches threat intelligence data from **URLHaus**, meaning availability depends on the external API.
+- The frontend does not have **advanced security features** like rate limiting or CAPTCHA.
+
+### Assumptions
+- The **MongoDB instance** is running locally or on **MongoDB Atlas** and is properly configured.
+- The **.env** file is correctly set up with valid credentials.
+- Users will **not commit sensitive credentials** (e.g., `JWT_SECRET`, `MONGODB_URI`) to version control.
+- The frontend will run on **port 5173** and the backend on **port 8000**, unless otherwise specified in the `.env` file.
+
+
 Here are the screenshots for the **Login** and **Dashboard** pages:  
 
 ![Login Screenshot](login.png)  
