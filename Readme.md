@@ -92,3 +92,7 @@ By default, the React app should start on **[http://localhost:5173](http://local
 - The `CORS_ORIGIN` in `.env` should match the origin of your React app if you run into **CORS issues**.
 - In a **production environment**, you’d typically run:  npm run build
 
+Here are the screenshots for the **Login** and **Dashboard** pages:  
+
+![Login Screenshot](login.png)  
+![Dashboard Screenshot](dash.png)  
